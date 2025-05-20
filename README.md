@@ -1,8 +1,15 @@
 # Trabalho PySpark
 🎬 Análise e Recomendação de Filmes com PySpark
 Um sistema de análise e recomendação de filmes construído usando PySpark e o dataset MovieLens 25M.
+
+
+
 📋 Visão Geral
 Este projeto demonstra como construir um sistema de recomendação de filmes utilizando técnicas de filtragem colaborativa através do algoritmo ALS (Alternating Least Squares) do Apache Spark. O sistema analisa o dataset MovieLens 25M, que contém 25 milhões de avaliações de 62.000 filmes feitas por 162.000 usuários.
+
+
+
+
 🌟 Funcionalidades
 
 Análise Exploratória de Dados:
