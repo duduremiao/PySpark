@@ -1,6 +1,6 @@
+
 # ==============================================================================
-# SPARK DATA ENGINEERING - REQUIREMENTS
-# Versão focada para demonstração de competências em Engenharia de Dados
+# REQUIREMENTS.TXT - SPARK MOVIE ANALYTICS COM GRAFANA
 # ==============================================================================
 
 # Core Spark and Distributed Computing
@@ -15,46 +15,31 @@ numpy==1.24.3
 # Machine Learning (ALS Recommendations)
 scikit-learn==1.3.0
 
-# Data Visualization and Monitoring
+# Data Visualization
 matplotlib==3.7.2
 seaborn==0.12.2
 
 # Data Format Support
 pyarrow==12.0.1
 
+# *** DEPENDÊNCIAS FALTANDO NO SEU REQUIREMENTS ORIGINAL ***
+
+# Prometheus Integration (ESSENCIAL para métricas)
+prometheus-client==0.19.0
+
+# HTTP Requests (ESSENCIAL para Grafana API)
+requests==2.31.0
+
 # System Utilities
 python-dateutil==2.8.2
 pytz==2023.3
 
+# Logging Enhancement (opcional mas recomendado)
+colorama==0.4.6
+
+# Development and Testing (opcional)
+pytest==7.4.3
+pytest-spark==0.6.0
+
 # Optional: Dataset Download
 # kaggle==1.5.16
-
-# ==============================================================================
-# INSTALLATION NOTES
-# ==============================================================================
-# 
-# Para instalar Java (necessário para Spark):
-# 
-# Windows:
-# 1. Baixar OpenJDK 11 ou 17
-# 2. Configurar JAVA_HOME
-# 3. Adicionar ao PATH
-# 
-# Linux/Mac:
-# sudo apt-get install openjdk-11-jdk  # Ubuntu/Debian
-# brew install openjdk@11              # macOS
-# 
-# Verificar instalação:
-# java -version
-# 
-# ==============================================================================
-# USAGE EXAMPLE
-# ==============================================================================
-# 
-# pip install -r requirements.txt
-# python spark_movie_analytics.py
-# 
-# Para troubleshooting:
-# python spark_movie_analytics.py --help
-# 
-# ==============================================================================
