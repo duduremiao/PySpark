@@ -1,0 +1,8 @@
+# Ignora tudo
+*
+
+# Mas não ignore estes arquivos:
+!.gitignore
+!*.py
+!requirements.txt
+!README*

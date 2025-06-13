@@ -51,9 +51,13 @@ logger = setup_logging()
 # ==============================================================================
 
 def create_spark_session():
-    """Cria Spark Session com configurações otimizadas para produção"""
+    """Cria Spark Session com configurações otimizadas para produção e monitoramento"""
     logger.info("Criando Spark Session...")
-    
+
+    metrics_agent_path = "./metrics/jmx_prometheus_javaagent-0.20.0.jar"
+    metrics_config_path = "./metrics/spark_metrics.yaml"
+    metrics_port = "7071"
+
     spark = SparkSession.builder \
         .appName("MovieAnalytics-DataEngineering") \
         .config("spark.sql.adaptive.enabled", "true") \
@@ -63,18 +67,55 @@ def create_spark_session():
         .config("spark.driver.memory", "4g") \
         .config("spark.executor.memory", "4g") \
         .config("spark.sql.shuffle.partitions", "200") \
+        .config("spark.driver.extraJavaOptions", 
+                f"-javaagent:{metrics_agent_path}={metrics_port}:{metrics_config_path}") \
         .getOrCreate()
-    
+
     spark.sparkContext.setLogLevel("WARN")
-    
+
     logger.info(f"✅ Spark Session criada - Versão: {spark.version}")
     logger.info(f"🔗 Spark UI: {spark.sparkContext.uiWebUrl}")
-    
+    logger.info(f"📡 Métricas expostas para Prometheus em http://localhost:{metrics_port}/metrics")
+
     return spark
 
 # ==============================================================================
 # CLASSE PRINCIPAL DE ANÁLISE
 # ==============================================================================
+
+import time
+
+def track_performance(operation_name):
+    """Decorator para monitorar performance de operações"""
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):
+            start_time = time.time()
+            logger.info(f"🚀 Iniciando: {operation_name}")
+
+            try:
+                result = func(self, *args, **kwargs)
+                execution_time = time.time() - start_time
+
+                self.performance_metrics[operation_name] = {
+                    'time': execution_time,
+                    'status': 'SUCCESS'
+                }
+
+                logger.info(f"✅ {operation_name} concluído em {execution_time:.2f}s")
+                return result
+
+            except Exception as e:
+                execution_time = time.time() - start_time
+                self.performance_metrics[operation_name] = {
+                    'time': execution_time,
+                    'status': 'ERROR',
+                    'error': str(e)
+                }
+                logger.error(f"❌ Erro em {operation_name}: {str(e)}")
+                raise
+
+        return wrapper
+    return decorator
 
 class MovieAnalytics:
     """Classe principal para análise de dados com Spark"""
@@ -89,41 +130,15 @@ class MovieAnalytics:
         return self
         
     def __exit__(self, exc_type, exc_val, exc_tb):
+        print("🔥 Spark rodando. Pressione ENTER para encerrar...")
+        
+        input()  # Aguarda a entrada do usuário
+        
         if self.spark:
             self.spark.stop()
             logger.info("🔄 Spark Session finalizada")
 
-    def track_performance(self, operation_name):
-        """Decorator para monitorar performance de operações"""
-        def decorator(func):
-            def wrapper(*args, **kwargs):
-                start_time = time.time()
-                logger.info(f"🚀 Iniciando: {operation_name}")
-                
-                try:
-                    result = func(*args, **kwargs)
-                    execution_time = time.time() - start_time
-                    
-                    self.performance_metrics[operation_name] = {
-                        'time': execution_time,
-                        'status': 'SUCCESS'
-                    }
-                    
-                    logger.info(f"✅ {operation_name} concluído em {execution_time:.2f}s")
-                    return result
-                    
-                except Exception as e:
-                    execution_time = time.time() - start_time
-                    self.performance_metrics[operation_name] = {
-                        'time': execution_time,
-                        'status': 'ERROR',
-                        'error': str(e)
-                    }
-                    logger.error(f"❌ Erro em {operation_name}: {str(e)}")
-                    raise
-                    
-            return wrapper
-        return decorator
+
 
     @track_performance("load_data")
     def load_data(self, ratings_path, movies_path):
@@ -357,7 +372,7 @@ class MovieAnalytics:
         for bar, time_val in zip(bars, times):
             plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1,
                     f'{time_val:.2f}s', ha='center', va='bottom')
-        
+    
         # Subplot 2: Resumo de status
         plt.subplot(1, 2, 2)
         status_counts = {'SUCCESS': statuses.count('SUCCESS'), 
@@ -367,8 +382,7 @@ class MovieAnalytics:
         plt.title('Status das Operações')
         
         plt.tight_layout()
-        plt.savefig('performance_dashboard.png', dpi=150, bbox_inches='tight')
-        plt.show()
+        plt.savefig('performance_dashboard.png', dpi=150, bbox_inches='tight')    
 
     def get_cluster_info(self):
         """Obtém informações do cluster Spark"""
