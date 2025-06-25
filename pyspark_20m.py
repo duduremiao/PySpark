@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Spark Data Engineering - Movie Analytics com Grafana Integration
-SEM PUSHGATEWAY - Usando file_sd_config do Prometheus
-
-Modificado para não usar Pushgateway
 """
 
 import findspark
@@ -328,7 +325,7 @@ def create_spark_session():
     return spark
 
 # ==============================================================================
-# CLASSE PRINCIPAL COM INTEGRAÇÃO GRAFANA (SEM PUSHGATEWAY)
+# CLASSE PRINCIPAL COM INTEGRAÇÃO GRAFANA 
 # ==============================================================================
 
 def track_performance_with_metrics(operation_name):
@@ -643,7 +640,7 @@ class MovieAnalyticsWithGrafana:
 # ==============================================================================
 
 def main():
-    """Função principal com integração Grafana (sem Pushgateway)"""
+    """Função principal com integração Grafana"""
     
     print("🎬 Spark Data Engineering - Movie Analytics + Grafana")
     print("="*60)
